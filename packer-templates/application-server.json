@@ -8,6 +8,7 @@
       "AWS_ACCESS_KEY_ID": "{{env `AWS_ACCESS_KEY_ID`}}",
       "AWS_SECRET_ACCESS_KEY": "{{env `AWS_SECRET_ACCESS_KEY`}}",
       "DIGITALOCEAN_API_TOKEN": "{{env `DIGITALOCEAN_API_TOKEN`}}",
+      "DIGITALOCEAN_IMAGE": "ubuntu-18-04-x64",
       "SSH_FULLNAME": "vagrant",
       "SSH_PASSWORD": "vagrant",
       "SSH_USERNAME": "vagrant"
@@ -88,10 +89,11 @@
       {
         "type": "digitalocean",
         "api_token": "{{ user `DIGITALOCEAN_API_TOKEN` }}",
-        "image": "ubuntu-14-04-x64",
-        "region": "tor1",
+        "image": "{{ user `DIGITALOCEAN_IMAGE` }}",
+        "region": "lon1",
         "size": "512mb",
         "droplet_name": "udacity-devops",
+        "ssh_username": "root",
         "private_networking": true
       }
   ],
