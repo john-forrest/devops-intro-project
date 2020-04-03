@@ -1,10 +1,17 @@
 {
   "variables": {
       "PACKER_OS_FLAVOUR": "ubuntu",
-      "PACKER_BOX_NAME": "ubuntu-14.04.6-server-amd64",
+      "PACKER_BOX_NAME": "ubuntu-18.04.4-server-amd64",
+      "UBUNTU_IMAGE_NAME": "{{user `PACKER_BOX_NAME` }}",
+      "UBUNTU_IMAGE_CHECKSUM": "e2ecdace33c939527cbc9e8d23576381c493b071107207d2040af72595f8990b",
+      "UBUNTU_DOWNLOAD_HTTP": "http://cdimage.ubuntu.com/ubuntu/releases/bionic/release",
       "AWS_ACCESS_KEY_ID": "{{env `AWS_ACCESS_KEY_ID`}}",
       "AWS_SECRET_ACCESS_KEY": "{{env `AWS_SECRET_ACCESS_KEY`}}",
-      "DIGITALOCEAN_API_TOKEN": "{{env `DIGITALOCEAN_API_TOKEN`}}"
+      "DIGITALOCEAN_API_TOKEN": "{{env `DIGITALOCEAN_API_TOKEN`}}",
+      "DIGITALOCEAN_IMAGE": "ubuntu-18-04-x64",
+      "SSH_FULLNAME": "vagrant",
+      "SSH_PASSWORD": "vagrant",
+      "SSH_USERNAME": "vagrant"
   },
   "builders": [
       {
@@ -20,6 +27,7 @@
           " console-setup/modelcode=pc105<wait>",
           " debconf/frontend=noninteractive<wait>",
           " debian-installer=en_US<wait>",
+          " grub-installer/bootdev=/dev/sda<wait>",
           " fb=false<wait>",
           " initrd=/install/initrd.gz<wait>",
           " kbd-chooser/method=us<wait>",
@@ -29,6 +37,10 @@
           " netcfg/get_domain=vm<wait>",
           " netcfg/get_hostname=vagrant<wait>",
           " noapic<wait>",
+          " passwd/user-fullname={{user `SSH_FULLNAME`}}<wait>",
+          " passwd/user-password={{user `SSH_PASSWORD`}}<wait>",
+          " passwd/user-password-again={{user `SSH_PASSWORD`}}<wait>",
+          " passwd/username={{user `SSH_USERNAME`}}<wait>",
           " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<wait>",
           " -- <wait>",
           "<enter><wait>"
@@ -39,13 +51,13 @@
         "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
         "guest_os_type": "Ubuntu_64",
         "http_directory": "http",
-        "iso_checksum": "b17d7c1e9d0321ad5810ba77b69aef43f0f29a5422b08120e6ee0576c4527c0e",
+        "iso_checksum": "{{user `UBUNTU_IMAGE_CHECKSUM` }}",
         "iso_checksum_type": "sha256",
-        "iso_url": "http://releases.ubuntu.com/trusty/{{ user `PACKER_BOX_NAME` }}.iso",
-        "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
-        "ssh_password": "vagrant",
+        "iso_url": "{{user `UBUNTU_DOWNLOAD_HTTP` }}/{{ user `UBUNTU_IMAGE_NAME` }}.iso",
+        "shutdown_command": "echo '{{user `SSH_USERNAME`}}'|sudo -S shutdown -P now",
+        "ssh_password": "{{user `SSH_PASSWORD`}}",
         "ssh_port": 22,
-        "ssh_username": "vagrant",
+        "ssh_username": "{{user `SSH_USERNAME`}}",
         "ssh_wait_timeout": "10000s",
         "vm_name": "control-{{ user `PACKER_BOX_NAME` }}",
         "vboxmanage": [
@@ -77,17 +89,18 @@
       {
       "type": "digitalocean",
       "api_token": "{{ user `DIGITALOCEAN_API_TOKEN` }}",
-      "image": "ubuntu-14-04-x64",
-      "region": "tor1",
+        "image": "{{ user `DIGITALOCEAN_IMAGE` }}",
+        "region": "lon1",
       "size": "512mb",
       "droplet_name": "udacity-devops",
+        "ssh_username": "root",
       "private_networking": true
     }
   ],
   "provisioners": [
     {
       "type": "shell",
-      "execute_command": "echo 'vagrant'|sudo -S -E bash '{{.Path}}'",
+      "execute_command": "echo '{{user `SSH_USERNAME`}}'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
         "scripts/update.sh"
       ]
@@ -95,7 +108,7 @@
     {
     "type": "shell",
     "only": ["virtualbox-iso"],
-    "execute_command": "echo 'vagrant'|sudo -S -E bash '{{.Path}}'",
+    "execute_command": "echo '{{user `SSH_USERNAME`}}'|sudo -S -E bash '{{.Path}}'",
     "scripts": [
     "scripts/virtualbox.sh",
     "scripts/vagrant.sh"
@@ -108,7 +121,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "echo 'vagrant'|sudo -S -E bash '{{.Path}}'",
+      "execute_command": "echo '{{user `SSH_USERNAME`}}'|sudo -S -E bash '{{.Path}}'",
       "scripts": [
         "scripts/jenkins.sh",
         "scripts/graphite.sh",
