@@ -89,12 +89,13 @@
       {
       "type": "digitalocean",
       "api_token": "{{ user `DIGITALOCEAN_API_TOKEN` }}",
-        "image": "{{ user `DIGITALOCEAN_IMAGE` }}",
-        "region": "lon1",
+      "image": "{{ user `DIGITALOCEAN_IMAGE` }}",
+      "region": "lon1",
       "size": "512mb",
-      "droplet_name": "udacity-devops",
-        "ssh_username": "root",
-      "private_networking": true
+      "droplet_name": "control-{{ user `PACKER_BOX_NAME` }}",
+      "ssh_username": "root",
+      "private_networking": true,
+      "snapshot_name": "control-{{ user `PACKER_BOX_NAME` }}-{{timestamp}}"
     }
   ],
   "provisioners": [

@@ -92,9 +92,10 @@
         "image": "{{ user `DIGITALOCEAN_IMAGE` }}",
         "region": "lon1",
         "size": "512mb",
-        "droplet_name": "udacity-devops",
+        "droplet_name": "application-{{ user `PACKER_BOX_NAME` }}",
         "ssh_username": "root",
-        "private_networking": true
+        "private_networking": true,
+        "snapshot_name": "application-{{ user `PACKER_BOX_NAME` }}-{{timestamp}}"
       }
   ],
 
