@@ -14,16 +14,23 @@ apt-get remove --purge node
 # add Node.js maintained repositories
 curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
 
+apt-get upgrade
+
 # for tests and build
-apt-get -y install nodejs
+#npm is included in nodejs after v10.0. note sure about need for node-grunt-cli but
+#do anyway and force grunt below too (they clash)
+#apt-get -y install nodejs npm node-grunt-cli
+#apt-get -y install nodejs
+apt-get -y install nodejs node-grunt-cli
 # for phantomjs
 apt-get -y install libfontconfig1 fontconfig libfontconfig1-dev libfreetype6-dev
 
 # for sass
-apt-get -y install ruby
+apt-get -y install ruby ruby-dev
 gem install sass
 
-#for running grunt tasks manually
+#for running grunt tasks manually (see note about force above)
+#npm install --force -g grunt-cli
 npm install -g grunt-cli
 
 # install some additional packeges required by the app
